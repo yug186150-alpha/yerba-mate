@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yerba Mate Market Study</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1B3022;
+  --secondary: #D9B48F;
+  --tertiary: #944925;
+  --neutral: #F5F2EA;
+  --bg-card: rgba(245, 242, 234, 0.04);
+  --border: rgba(245, 242, 234, 0.1);
+  --text-muted: rgba(245, 242, 234, 0.7);
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Work Sans', sans-serif;
+  background-color: var(--primary);
+  color: var(--neutral);
+  margin: 0; padding: 40px;
+  line-height: 1.6;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+
+/* Typography */
+h1, h2, h3, h4, .stat-value, .brand-name { font-family: 'Newsreader', serif; font-weight: 600; }
+h1 { font-size: 2.5rem; margin: 0 0 24px; color: var(--neutral); }
+h2 { font-size: 1.8rem; margin: 60px 0 24px; border-top: 1px solid var(--border); padding-top: 32px; color: var(--secondary); display:flex; align-items:center; gap:8px;}
+h3 { font-size: 1.3rem; margin: 0 0 16px; color: var(--neutral); }
+h4 { font-size: 1.1rem; margin: 0 0 8px; color: var(--secondary); }
+
+/* Stats */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+.stat-value { font-size: 2rem; color: var(--neutral); line-height: 1.1; }
+.stat-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+/* Paragraph */
+.accent-para { border-left: 3px solid var(--secondary); padding-left: 16px; color: var(--text-muted); font-size: 1rem; margin: 32px 0; }
+
+/* Regions Layout */
+.col-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.region-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.9rem; }
+.region-label { width: 120px; color: var(--text-muted); }
+.region-track { flex-grow: 1; background: rgba(0,0,0,0.2); height: 10px; border-radius: 5px; margin: 0 16px; border: 1px solid var(--border); overflow: hidden; }
+.region-fill { height: 100%; border-radius: 5px; }
+.region-value { width: 55px; text-align: right; font-weight: 600; }
+
+/* Country list */
+.c-item { display: flex; gap: 16px; margin-bottom: 12px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border); align-items:flex-start;}
+.c-flag { font-size: 1.5rem; line-height:1;}
+.c-text strong { display: block; color: var(--secondary); margin-bottom: 4px; font-size: 1rem; }
+.c-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
+
+/* Pills */
+.pill { padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 0.95rem; font-weight: 500; border: 1px solid; }
+.pill-driver { background: rgba(217,180,143,0.1); border-color: var(--secondary); color: var(--secondary); }
+.pill-challenge { background: rgba(148,73,37,0.1); border-color: var(--tertiary); color: #944925; }
+
+/* Brand Cards */
+.brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;}
+.brand-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; position:relative; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; background: var(--secondary); color: var(--primary); font-family: 'Newsreader', serif; }
+.brand-name { font-size: 1.4rem; color: var(--neutral); margin: 0; }
+.brand-tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin: 8px 0 12px 0; border: 1px solid; text-transform:uppercase; letter-spacing:0.5px;}
+.tag-in { background: rgba(217,180,143,0.15); border-color: var(--secondary); color: var(--secondary); }
+.tag-uy { background: rgba(148,73,37,0.15); border-color: var(--tertiary); color: #944925; }
+.tag-py { background: rgba(245,242,234,0.15); border-color: var(--neutral); color: var(--neutral); }
+.tag-ar { background: rgba(217,180,143,0.15); border-color: #D9B48F; color: #F5F2EA; }
+.brand-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Horizontal Brands */
+.h-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; align-items: center; gap: 24px; margin-bottom: 12px; }
+.h-col-1 { flex: 0 0 200px; }
+.h-col-2 { flex: 1; font-size: 0.9rem; color: var(--text-muted); }
+.h-col-3 { flex: 0 0 120px; text-align:right;}
+
+/* Tables / Comparisons */
+table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 0.95rem; }
+th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--secondary); font-weight: 600; font-family: 'Newsreader', serif; font-size: 1.1rem; }
+tr:hover { background: var(--bg-card); }
+td { color: var(--text-muted); }
+td strong { color: var(--neutral); }
+
+/* Types */
+.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+.type-card { background: var(--bg-card); border-top: 3px solid var(--secondary); padding: 24px; border-radius: 8px; }
+.type-card h3 { color: var(--secondary); margin-bottom: 12px; }
+.type-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+/* Chart Area */
+.chart-container { height: 350px; margin-top: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+
+.pdf-btn { position: fixed; bottom: 20px; right: 20px; background: var(--secondary); color: var(--primary); border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: 'Work Sans'; z-index: 99; transition: background 0.2s; }
+.pdf-btn:hover { background: #D9B48F; }
+
+@media print {
+  @page { size: landscape; margin: 0; }
+  body { background: var(--primary) !important; padding: 20px 40px; }
+  .pdf-btn { display: none !important; }
+  *{-webkit-print-color-adjust: exact!important; print-color-adjust: exact!important;}
+}
+</style>
+</head>
+<body>
+
+<button class="pdf-btn" onclick="window.print()">Download PDF</button>
+
+<div class="container">
+
+  <h1>Global market overview</h1>
+  
+  <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); grid-template-rows: auto auto;">
+    <div class="stat-card"><div class="stat-label">Market size (2024)</div><div class="stat-value">$2.1B</div><div class="stat-sub">USD billion</div></div>
+    <div class="stat-card"><div class="stat-label">Forecast (2034)</div><div class="stat-value">$3.4B</div><div class="stat-sub">USD billion</div></div>
+    <div class="stat-card"><div class="stat-label">CAGR</div><div class="stat-value">5.7%</div><div class="stat-sub">2025–2033</div></div>
+    <div class="stat-card"><div class="stat-label">Loose-leaf share</div><div class="stat-value">56%</div><div class="stat-sub">Dominant form</div></div>
+    <div class="stat-card"><div class="stat-label">Unflavored share</div><div class="stat-value">68%</div><div class="stat-sub">Category dominance</div></div>
+    <div class="stat-card" style="border-color: var(--secondary); grid-column: 1 / -1; margin-top: -8px;">
+      <div class="stat-label" style="color:var(--secondary)">Top exporters</div>
+      <div class="stat-value" style="color:var(--secondary)">BR+AR</div>
+      <div class="stat-sub" style="color:var(--secondary); opacity:0.8">Brazil leads at $102M</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="mainChart"></canvas>
+  </div>
+  
+  <p class="accent-para">The market has grown rapidly since 2020, driven by functional beverages and the health-conscious consumer shift. Brands are increasingly launching RTD, nootropic, and botanical-blend products targeting millennials and Gen Z globally.</p>
+
+  <h2>Regional breakdown</h2>
+  <div class="col-2">
+    <div>
+      <h3>Production share (2025)</h3>
+      <div class="region-row"><div class="region-label">Latin America</div><div class="region-track"><div class="region-fill" style="width:79.7%;background:var(--secondary)"></div></div><div class="region-value">79.7%</div></div>
+      <div class="region-row"><div class="region-label">Asia-Pacific</div><div class="region-track"><div class="region-fill" style="width:45.9%;background:var(--tertiary)"></div></div><div class="region-value">+45.9%</div></div>
+      <div class="region-row"><div class="region-label">North America</div><div class="region-track"><div class="region-fill" style="width:40%;background:var(--neutral)"></div></div><div class="region-value">+40%</div></div>
+      <div class="region-row"><div class="region-label">Europe</div><div class="region-track"><div class="region-fill" style="width:35%;background:#F5F2EA"></div></div><div class="region-value">+35%</div></div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:20px;">APAC/NA/EU figures show demand growth rate vs. prior period</div>
+    </div>
+    
+    <div>
+      <h3>Key country leaders</h3>
+      <div class="c-item"><div class="c-flag">🇦🇷</div><div class="c-text"><strong>Argentina</strong>Largest producer; $82.5M exports (2024). Home to Taragüi, Rosamonte, Amanda</div></div>
+      <div class="c-item"><div class="c-flag">🇧🇷</div><div class="c-text"><strong>Brazil</strong>Top exporter at $102M. Supplies raw leaf to Uruguay & others</div></div>
+      <div class="c-item"><div class="c-flag">🇩🇪</div><div class="c-text"><strong>Germany</strong>Europe's largest yerba mate market; health-conscious consumers</div></div>
+      <div class="c-item"><div class="c-flag">🇨🇳</div><div class="c-text"><strong>China</strong>Fastest growing at 8.2% CAGR — huge opportunity in APAC</div></div>
+    </div>
+  </div>
+
+  <h2>India market spotlight 🇮🇳</h2>
+  <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="stat-card"><div class="stat-label">Market status</div><div class="stat-value">Nascent</div><div class="stat-sub">Early growth phase</div></div>
+    <div class="stat-card"><div class="stat-label">ASEAN CAGR</div><div class="stat-value">10.1%</div><div class="stat-sub">India is a key country</div></div>
+    <div class="stat-card"><div class="stat-label">Key driver</div><div class="stat-value">E-com</div><div class="stat-sub">Online retail is primary channel</div></div>
+    <div class="stat-card"><div class="stat-label">Consumer</div><div class="stat-value">Youth</div><div class="stat-sub">Urban millennials & Gen Z</div></div>
+  </div>
+
+  <p class="accent-para">India's yerba mate market is at an early but promising stage. Surging herbal tea consumption, growing internet marketing, rising disposable incomes, and urban wellness trends are the key growth drivers. However, high import prices, limited retail shelf presence, and low consumer awareness remain the primary challenges. E-commerce platforms like Amazon India are the dominant channel. The ASEAN region (including India) is projected to reach $127.8M by 2035 at a 10.1% CAGR.</p>
+
+  <div class="col-2" style="margin-top:32px;">
+    <div>
+      <h3>Market drivers</h3>
+      <div class="pill pill-driver">Health & wellness boom among young urban Indians</div>
+      <div class="pill pill-driver">Growing coffee-alternative seeker segment</div>
+      <div class="pill pill-driver">Social media & influencer-led product discovery</div>
+      <div class="pill pill-driver">E-commerce enabling niche import brands</div>
+    </div>
+    <div>
+      <h3>Challenges</h3>
+      <div class="pill pill-challenge">High prices due to import costs & limited production</div>
+      <div class="pill pill-challenge">Low retail shelf presence outside metros</div>
+      <div class="pill pill-challenge">Low consumer awareness of brewing rituals</div>
+      <div class="pill pill-challenge">Competition from established chai & green tea market</div>
+    </div>
+  </div>
+
+  <h2>Indian brands spotlight 🇮🇳</h2>
+  <div class="brand-grid">
+    <div class="brand-card">
+      <div class="avatar">M</div>
+      <h3 class="brand-name">Matero</h3>
+      <div class="brand-tag tag-in">India-based</div>
+      <div class="brand-desc">India's only dedicated brand. Founded by Indian entrepreneurs. Offers loose-leaf yerba mate, tea bags, gourds, and bombillas. Available on Amazon.in, Flipkart, JioMart. <a href="https://matero.in" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">matero.in ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar">S</div>
+      <h3 class="brand-name">Solmaté</h3>
+      <div class="brand-tag tag-in">India-based</div>
+      <div class="brand-desc">An Indian brand that differentiates with unsmoked (air-dried) yerba mate sourced from Argentina. Highlights absence of PAH compounds vs. smoke-dried alternatives. Ships pan-India. <a href="https://sol-mate.in" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">sol-mate.in ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar">Y</div>
+      <h3 class="brand-name">Yerbaé</h3>
+      <div class="brand-tag tag-in">Import / Global</div>
+      <div class="brand-desc">US-based publicly traded brand focusing on plant-based energy drinks infused with yerba mate. Strong global appeal in the health-energy space. Revenue: $5.91M (2024). <a href="https://yerbae.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">yerbae.com ↗</a></div>
+    </div>
+  </div>
+
+  <h2>Argentine brands 🇦🇷</h2>
+  <div class="brand-grid">
+    <div class="brand-card">
+      <div class="avatar" style="background:#1B3022">T</div>
+      <h3 class="brand-name">Taragüi</h3>
+      <div class="brand-tag tag-ar">Classic Leader</div>
+      <div class="brand-desc">Argentina's best-selling yerba mate brand. Classic, reliable, accessible flavour. Sourced from Las Marías. Great overall choice for general consumption. <a href="https://www.taragui.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">taragui.com ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:#1B3022">C</div>
+      <h3 class="brand-name">Cruz de Malta</h3>
+      <div class="brand-tag tag-ar">Smooth/Beginner</div>
+      <div class="brand-desc">One of Argentina's most popular exported brands. Smooth, slightly sweet/buttery flavour with large leaves and low dust. Excellent starting point. <a href="https://www.cruzdemalta.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">cruzdemalta.com.ar ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:#1B3022">P</div>
+      <h3 class="brand-name">Playadito</h3>
+      <div class="brand-tag tag-ar">Sweet/Approachable</div>
+      <div class="brand-desc">Sweet, herbal, and approachable. Outstanding beginner brand due to its low bitterness and high stem content. Massively popular in Argentina. <a href="https://www.playadito.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">playadito.com.ar ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:#1B3022">R</div>
+      <h3 class="brand-name">Rosamonte</h3>
+      <div class="brand-tag tag-ar">Smoky/Woody</div>
+      <div class="brand-desc">Traditional Argentine brand, known for bold, smoky, woody character. The "Especial" is aged 24 months for complexity. "Suave" is milder. <a href="https://www.rosamonte.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">rosamonte.com.ar ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:#1B3022">C</div>
+      <h3 class="brand-name">CBSé</h3>
+      <div class="brand-tag tag-ar">Flavored Blends</div>
+      <div class="brand-desc">Argentina's leading flavoured yerba mate brand. Extensive range: Naranja, Pomelo, Frutos del Bosque, Energía (guaraná), Miel. <a href="https://www.cbse.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">cbse.com.ar ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:#1B3022">K</div>
+      <h3 class="brand-name">Kraus</h3>
+      <div class="brand-tag tag-ar">Organic/Unsmoked</div>
+      <div class="brand-desc">Organic, air-dried, zero-smoke yerba mate. Clean, mellow profile. Great for those seeking a pure, non-carcinogenic taste profile without smoke notes. <a href="https://www.kraus.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">kraus.com.ar ↗</a></div>
+    </div>
+  </div>
+
+  <h2>Uruguay brands 🇺🇾</h2>
+  <div class="brand-grid">
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--tertiary);color:var(--neutral)">C</div>
+      <h3 class="brand-name">Canarias</h3>
+      <div class="brand-tag tag-uy">Uruguay Benchmark</div>
+      <div class="brand-desc">The benchmark for Uruguayan-style mate. Intense, bold, long-lasting, creamy texture. Very fine, powdery consistency. Expert-level, dominant market share. <a href="https://www.canarias.com.uy" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">canarias.com.uy ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--tertiary);color:var(--neutral)">S</div>
+      <h3 class="brand-name">Canarias Serena</h3>
+      <div class="brand-tag tag-uy">Blended / Calming</div>
+      <div class="brand-desc">A compuesta (blended) variant of Canarias. Infused with linden, passionflower, mint, and lemon balm. Smoother, calmer, and milder than standard.</div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--tertiary);color:var(--neutral)">S</div>
+      <h3 class="brand-name">Sara</h3>
+      <div class="brand-tag tag-uy">Premium P.U.1</div>
+      <div class="brand-desc">Established 1918. A premium P.U.1 grade product. Balanced bitterness with a sweet finish. Softer alternative to Canarias for Uruguayan cut. <a href="https://www.sara.com.uy" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">sara.com.uy ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--tertiary);color:var(--neutral)">D</div>
+      <h3 class="brand-name">Del Cebador</h3>
+      <div class="brand-tag tag-uy">Full-bodied / Malty</div>
+      <div class="brand-desc">Rich, malty, sometimes chocolatey notes. Full-bodied and consistent processing. Highly popular daily drinker for experienced users. <a href="https://www.delcebador.com.uy" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">delcebador.com.uy ↗</a></div>
+    </div>
+  </div>
+
+  <h2>Paraguayan brands 🇵🇾</h2>
+  <div class="brand-grid">
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--neutral);color:var(--primary)">P</div>
+      <h3 class="brand-name">Pajarito</h3>
+      <div class="brand-tag tag-py">Paraguay Legacy</div>
+      <div class="brand-desc">Considered a national symbol of Paraguay. Traditional barbacuá (smoke-dried) processing. Full control from plantation to packaging. Ideal for Tereré. <a href="https://pajarito.com.py" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">pajarito.com.py ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--neutral);color:var(--primary)">S</div>
+      <h3 class="brand-name">Selecta</h3>
+      <div class="brand-tag tag-py">Value & Range</div>
+      <div class="brand-desc">Outstanding price-to-quality ratio. Extensive range with numerous herbal and fruit-flavoured blends specifically designed for refreshing tall tereré drinks. <a href="https://www.selecta.com.py" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">selecta.com.py ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--neutral);color:var(--primary)">C</div>
+      <h3 class="brand-name">Campesino</h3>
+      <div class="brand-tag tag-py">Intense Blend</div>
+      <div class="brand-desc">Bold, intense flavour profile. Famous for creative herb/fruit blends (mint, boldo, citrus) balancing traditional methods with modern consumer tastes. <a href="https://www.campesino.com.py" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">campesino.com.py ↗</a></div>
+    </div>
+    <div class="brand-card">
+      <div class="avatar" style="background:var(--neutral);color:var(--primary)">G</div>
+      <h3 class="brand-name">Guayakí</h3>
+      <div class="brand-tag tag-py">USA / RTD Leader</div>
+      <div class="brand-desc">North America's leading brand. B-Corp sourcing from regenerative farming. Dominates the canned RTD market. Easy entry point for absolute beginners ($100M+ revenue). <a href="https://guayaki.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">guayaki.com ↗</a></div>
+    </div>
+  </div>
+
+  <h2>Types of Yerba Mate Processing</h2>
+  <div class="type-grid">
+    <div class="type-card">
+      <h3>Tereré (Cold Brew)</h3>
+      <p>Cold-brewed yerba mate, extremely popular in Paraguay. Served with ice water or fruit juice, often enhanced with fresh herbs, mint, or citrus. Ideal for Indian summers.</p>
+    </div>
+    <div class="type-card" style="border-top-color: var(--tertiary)">
+      <h3>Chimarrão</h3>
+      <p>A Brazilian specialty — finely pulverized, bright green, unaged leaves. Mild, grassy, and creamy flavour. Requires a special bomba filter due to fine powdery consistency.</p>
+    </div>
+    <div class="type-card" style="border-top-color: var(--neutral)">
+      <h3>French Press</h3>
+      <p>A convenient Western-style alternative. Uses ~1 tablespoon per cup, steeped in hot water (65°C–82°C) for 4–8 minutes. Ideal for beginners starting with Argentine-style yerba.</p>
+    </div>
+  </div>
+
+  <h2>Which brands export to India & allow commercial use</h2>
+  <p class="accent-para" style="margin-top:0;">Most established South American brands do not directly sell to India — export typically happens through regional distributors or B2B platforms (Alibaba, Torg, IndiaMART). "Commercial use" includes resale, white-label/private label, and ingredient supply for beverages or supplements. The table below reflects what is publicly verifiable through brand policies, wholesale programs, or verified distributor activity.</p>
+  
+  <h3 style="margin-top:24px; font-family:'Work Sans',sans-serif; color:var(--secondary); font-size:1.1rem;">Brands with confirmed/accessible export programs</h3>
+  
+  <div class="h-card" style="align-items: flex-start;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(217,180,143,0.15); color:var(--secondary);">LM</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">Las Marías (Taragüi, La Merced, Unión) 🇦🇷</strong>
+      Argentina's largest producer. Fully vertically integrated. Has global export operations and supplies to wholesalers worldwide. Wholesale bulk (20–25kg bags) available; private label via B2B negotiations. Indian importers like Chado Tea and Sunshine Teas already source Argentine mate — Las Marias is the most likely upstream supplier. Contact via <a href="https://www.taragui.com/en-gb" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">taragui.com/en-gb ↗</a> for B2B.
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag tag-py" style="margin:0; text-align:center;">Exports India</span>
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Commercial ✔</span>
+    </div>
+  </div>
+
+  <div class="h-card" style="align-items: flex-start;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(217,180,143,0.15); color:var(--secondary);">CB</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">CBSé (Establecimiento Santa Ana) 🇦🇷</strong>
+      Third-largest in Argentina by supermarket volume. ISO 9001-certified. In 2021 entered Middle East with custom 250g packaging and exported over 1 million kilos. Active exporter to USA, Spain, Uruguay, Paraguay. Offers flavoured variants (40+ types) ideal for Indian taste adaptation. Open to B2B custom packaging. MOQ ~1,000–5,000 units branded, higher for private label. <a href="https://www.cbse.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">cbse.com.ar ↗</a>
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag tag-py" style="margin:0; text-align:center;">Exports India</span>
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Commercial ✔</span>
+    </div>
+  </div>
+
+  <div class="h-card" style="align-items: flex-start;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(217,180,143,0.15); color:var(--secondary);">RS</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">Rosamonte (Hreñuk S.A.) 🇦🇷</strong>
+      Major Argentine brand with strong global wholesale presence. Distributes through Tigre Market (Europe), PampaDirect (Americas) and B2B exporters. Bulk and branded supply available. Well-suited for commercial resale. Rosamonte Especial is one of the most-imported Argentine yerbas globally. Reach via authorised distributors to import into India. <a href="https://www.rosamonte.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">rosamonte.com.ar ↗</a>
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag tag-py" style="margin:0; text-align:center;">Via distributors</span>
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Commercial ✔</span>
+    </div>
+  </div>
+
+  <div class="h-card" style="align-items: flex-start;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(217,180,143,0.15); color:var(--secondary);">CY</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">Centro Yerbatero Paraguayo 🇵🇾</strong>
+      Paraguay's state-linked export body. Actively promotes exports to new markets — in 2024 they secured deals at Gulfood Dubai for 90,000kg across Syria, UAE, Turkey, and Poland. Offers traditional, organic, and soluble yerba formats. The best point of contact for Paraguayan brands (Pajarito, Campesino) wanting to supply India commercially. Very open to new export markets. <a href="http://centroyerbateroparaguayo.org.py/" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">centroyerbateroparaguayo.org.py ↗</a>
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Active exporter</span>
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Commercial ✔</span>
+    </div>
+  </div>
+
+  <div class="h-card" style="align-items: flex-start;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(217,180,143,0.15); color:var(--secondary);">NT</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">Nutrada / Torg B2B Platforms (multi-brand)</strong>
+      These are B2B food marketplaces that aggregate certified yerba mate suppliers (Argentina, Brazil, Paraguay, Poland, Germany). Bulk yerba packed in 20–25kg bags for commercial use. Support private label in 100g–500g pouches. MOQ for bulk starts from 500kg. FSSAI-compliant import from these suppliers into India is achievable. Platforms: <a href="https://usetorg.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">usetorg.com ↗</a>, <a href="https://nutrada.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">nutrada.com ↗</a>, <a href="https://www.alibaba.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">alibaba.com ↗</a>.
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag tag-ar" style="margin:0; text-align:center;">B2B platform</span>
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Commercial ✔</span>
+    </div>
+  </div>
+
+  <div class="h-card" style="align-items: flex-start;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(217,180,143,0.15); color:var(--secondary);">EC</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">ECOTEAS (EcoTeas Organic) 🇺🇸</strong>
+      US-based B Corp with a formal wholesale programme (wholesale@ecoteas.com). Offers certificates of analysis, organic certs, fair trade certs, and Kosher certs on request. Bulk ingredient supply available. Accessible via iHerb India. Suitable for Indian companies wanting a certified, premium-tier Western brand to resell or use as ingredient. <a href="https://www.yerbamate.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">yerbamate.com ↗</a>
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag tag-ar" style="margin:0; text-align:center;">Wholesale ✔</span>
+      <span class="brand-tag" style="margin:0; text-align:center; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Commercial ✔</span>
+    </div>
+  </div>
+
+  <div class="h-card" style="align-items: flex-start; margin-bottom: 32px;">
+    <div style="flex-shrink:0;">
+      <div class="avatar" style="width:40px; height:40px; font-size:0.9rem; background:rgba(148,73,37,0.15); color:var(--tertiary);">YM</div>
+    </div>
+    <div class="h-col-2" style="margin-top:-4px;">
+      <strong style="color:var(--neutral); font-size:1.05rem; display:block; margin-bottom:4px; font-family:'Work Sans',sans-serif;">Yerba Madre (formerly Guayakí) 🇺🇸</strong>
+      Has distribution at 45,000+ retail locations in North America. Primarily a consumer RTD brand — not a bulk ingredient supplier. Available via Amazon India in small quantities. Not currently offering commercial supply or private label to Indian partners. Best used for product inspiration and RTD benchmark, not as a B2B sourcing partner for India. <a href="https://guayaki.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">guayaki.com ↗</a>
+    </div>
+    <div class="h-col-3" style="display:flex; flex-direction:column; gap:8px;">
+      <span class="brand-tag tag-uy" style="margin:0; text-align:center;">Consumer only</span>
+      <span class="brand-tag tag-uy" style="margin:0; text-align:center;">Commercial ✘</span>
+    </div>
+  </div>
+
+  <h2 style="margin-top: 64px;">Brand deep dives</h2>
+  
+  <h3 style="font-family:'Newsreader',serif; font-size:1.4rem; color:var(--neutral); margin:32px 0 24px;">Guayakí / Yerba Madre — deep profile</h3>
+  <div class="col-2" style="margin-bottom: 48px; gap: 32px; align-items: start;">
+    <div class="brand-card" style="border-top: 4px solid var(--secondary); background:var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <span class="brand-tag tag-in" style="margin: 0 0 16px 0; display:inline-block; font-size: 0.7rem; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Rebranded as Yerba Madre in 2025</span>
+      <h4 style="color:var(--neutral); margin-bottom:8px; font-family:'Newsreader',serif; font-size:1.6rem;">Guayakí → Yerba Madre 🇺🇸</h4>
+      <span class="brand-tag tag-py" style="margin: 0 0 20px 0; display:inline-block; font-size:0.7rem;">Founded 1996 · Sebastopol, California</span>
+      <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:24px; line-height:1.6;">Founded in 1996 at Cal Poly SLO by Argentinian Alex Pryor and Californian David Karr. Started as a senior project; grew into North America's dominant yerba mate brand. In May 2025, officially rebranded to Yerba Madre ("Mother Herb") to honor Indigenous cultural roots and deepen regenerative mission. The iconic yellow can stays. Works with 255 family farmers and Indigenous communities across Argentina, Brazil, and Paraguay. Revenues reached ~$100M by the early 2020s. Now the world's first yerba mate to achieve Regenerative Organic Certified™ Gold status.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(217,180,143,0.1); border-color:var(--secondary); color:var(--secondary);">B Corp (founding member 2007)</span>
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">Organic · Fair Trade</span>
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(217,180,143,0.15); border-color:#D9B48F; color:#F5F2EA;">ROC Gold 2025</span>
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(245,242,234,0.15); border-color:#F5F2EA; color:#D9B48F;">85% RTD market share NA</span>
+      </div>
+    </div>
+    
+    <div>
+      <h4 style="color:var(--secondary); font-family:'Work Sans',sans-serif; margin-bottom:16px;">Product range</h4>
+      <div class="c-item" style="padding:12px; align-items:flex-start;">
+        <div class="avatar" style="width:36px; height:36px; font-size:0.8rem; background:rgba(217,180,143,0.15); color:var(--secondary); flex-shrink:0;">LL</div>
+        <div class="c-text"><strong>Loose leaf traditional</strong>Air-dried, unsmoked organic yerba mate in resealable pouches. The OG product. Now available as Regenerative Organic Certified Gold.</div>
+      </div>
+      <div class="c-item" style="padding:12px; align-items:flex-start;">
+        <div class="avatar" style="width:36px; height:36px; font-size:0.8rem; background:rgba(217,180,143,0.15); color:#F5F2EA; flex-shrink:0;">RTD</div>
+        <div class="c-text"><strong>RTD cans (~20 flavours)</strong>Lemon Elation, Enlighten Mint, Revel Berry, Berry Lemonade, Watermelody + sparkling/still/energy-shot formats. 80–150mg caffeine per can.</div>
+      </div>
+      <div class="c-item" style="padding:12px; align-items:flex-start;">
+        <div class="avatar" style="width:36px; height:36px; font-size:0.8rem; background:rgba(148,73,37,0.15); color:#D9B48F; flex-shrink:0;">TB</div>
+        <div class="c-text"><strong>Tea sachets / mate shots</strong>Single-serve mate sachets and concentrated energy shots. Lower caffeine than traditional. Available on Amazon India via iHerb.</div>
+      </div>
+      <h4 style="color:var(--secondary); font-family:'Work Sans',sans-serif; margin-top:28px; margin-bottom:12px;">India availability</h4>
+      <p style="color:var(--text-muted); font-size:0.9rem;">Available on iHerb India and Amazon India (RTD cans, loose leaf sachets). Not directly sold by Yerba Madre to Indian distributors. For commercial import to India, contact through their US wholesale team — however they primarily serve North American retail. Better as a benchmark/inspiration than a B2B supply partner for India. <a href="https://guayaki.com" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">guayaki.com ↗</a></p>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Newsreader',serif; font-size:1.4rem; color:var(--neutral); margin:48px 0 24px;">Cruz de Malta — commercial profile</h3>
+  <div class="col-2" style="margin-bottom: 64px; gap: 32px; align-items: start;">
+    <div class="brand-card" style="border-top: 4px solid var(--tertiary); background:var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <span class="brand-tag tag-in" style="margin: 0 0 16px 0; display:inline-block; font-size: 0.7rem; background:rgba(148,73,37,0.15); border-color:var(--tertiary); color:#944925;">150+ years continuous production</span>
+      <h4 style="color:var(--neutral); margin-bottom:8px; font-family:'Newsreader',serif; font-size:1.6rem;">Cruz de Malta 🇦🇷</h4>
+      <span class="brand-tag tag-py" style="margin: 0 0 20px 0; display:inline-block; font-size:0.7rem;">Argentina · Est. 1874 · Molinos Río de la Plata</span>
+      <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:24px; line-height:1.6;">Founded in 1874, acquired in 2006 by Molinos Río de la Plata (est. 1902), one of Argentina's largest food conglomerates. Fully vertically integrated from Misiones/Corrientes plantations to final packaging. Known for coarser-than-average grind with larger leaves that extend flavour duration — one of the most recommended brands for beginners and the best coarse Argentine mate for French press use. Completely natural — no preservatives or artificial additives. Available globally via wholesale distributors.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(217,180,143,0.1); border-color:var(--secondary); color:var(--secondary);">Coarse grind</span>
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(148,73,37,0.15); border-color:#944925; color:#D9B48F;">No additives</span>
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(217,180,143,0.15); border-color:#D9B48F; color:#F5F2EA;">Beginner + expert</span>
+        <span class="brand-tag tag-py" style="margin:0; background:rgba(245,242,234,0.15); border-color:var(--text-muted); color:var(--neutral);">Gluten-free</span>
+      </div>
+    </div>
+    
+    <div>
+      <h4 style="color:var(--secondary); font-family:'Work Sans',sans-serif; margin-bottom:16px;">Variants</h4>
+      <ul style="color:var(--text-muted); font-size:0.95rem; line-height:1.6; padding-left:20px; margin-bottom:28px;">
+        <li style="margin-bottom:8px;"><strong style="color:var(--secondary)">Tradicional con palo</strong> — classic with stems; long duration, coarse, smooth</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--secondary)">Hojas Más Grandes</strong> — even larger leaf cut for maximum flavour duration</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--secondary)">Blend Boldo y Menta</strong> — boldo + mint; digestive support and freshness</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--secondary)">Blend Poleo y Manzanilla</strong> — pennyroyal + chamomile; relaxing herbal</li>
+        <li style="margin-bottom:8px;"><strong style="color:var(--secondary)">Orgánica</strong> — certified organic; cleaner, purer flavour profile</li>
+      </ul>
+      <h4 style="color:var(--secondary); font-family:'Work Sans',sans-serif; margin-bottom:12px;">India commercial route</h4>
+      <p style="color:var(--text-muted); font-size:0.9rem;">Part of Molinos Río de la Plata's export division. Contact <a href="https://www.cruzdemalta.com.ar" target="_blank" style="color:var(--secondary); text-decoration:none; font-weight:600;">cruzdemalta.com.ar ↗</a> for B2B. Available through PampaDirect, TigreMarket, and Alibaba-listed Argentine food exporters. Strong candidate for commercial resale in India — widely recognised as a best-value brand globally, which translates well to price-conscious Indian e-commerce buyers.</p>
+    </div>
+  </div>
+
+  <h2>Commercial Partnerships & Sourcing</h2>
+  <table>
+    <tr>
+      <th>Factor</th>
+      <th>Buy Bulk from Plantations</th>
+      <th>Buy Established Brands (Resell)</th>
+    </tr>
+    <tr>
+      <td><strong>Per-kg Cost</strong></td>
+      <td>₹150–400/kg (bulk, before shipping)</td>
+      <td>₹800–2000/kg (retail finished)</td>
+    </tr>
+    <tr>
+      <td><strong>Profit Margin</strong></td>
+      <td><strong style="color:var(--secondary)">High (60–75% potential)</strong></td>
+      <td>Low (15–30%)</td>
+    </tr>
+    <tr>
+      <td><strong>MOQ</strong></td>
+      <td>Higher (25kg–20 tonnes)</td>
+      <td>Lower (single cases)</td>
+    </tr>
+    <tr>
+      <td><strong>Branding Control</strong></td>
+      <td><strong style="color:var(--secondary)">Yes — your brand, your packaging</strong></td>
+      <td>No — sell under their brand</td>
+    </tr>
+    <tr>
+      <td><strong>Capital Required</strong></td>
+      <td>₹10–50 Lakh</td>
+      <td>₹2–10 Lakh</td>
+    </tr>
+    <tr>
+      <td><strong>Quality & Compliance</strong></td>
+      <td>You verify via COA & Phytosanitary certs</td>
+      <td>Pre-assured by the international brand</td>
+    </tr>
+    <tr>
+      <td><strong>Product Customisation</strong></td>
+      <td><strong style="color:var(--secondary)">Yes (blend with cardamom, ginger, tulsi)</strong></td>
+      <td>No customisation possible</td>
+    </tr>
+  </table>
+
+  <p class="accent-para" style="margin-top:24px;"><strong>Recommended Strategy:</strong> Start by reselling established brands (Phase 1) to test market demand, then transition to bulk sourcing (Phase 2) from Argentine/Paraguayan exporters (e.g. Las Marías, EBSA) allowing you to blend Indian flavours and capture the 60-75% profit margins under your own premium brand label.</p>
+
+  <h2 style="margin-top:64px;">Beginner vs. expert comparison</h2>
+  <div class="chart-container" style="height:350px; margin-bottom:64px; border:none; background:transparent; padding:0;">
+    <canvas id="beginnerChart"></canvas>
+  </div>
+
+  <h2>Produce it ourselves vs. buy from brands</h2>
+  <p class="accent-para" style="margin-top:0;">Yerba mate (Ilex paraguariensis) grows only in subtropical South American climates — Argentina, Brazil, Paraguay, and parts of Uruguay/Bolivia. India's climate does not support cultivation. "Producing ourselves" therefore means setting up a blending, packaging, and branding operation in India using imported raw material — not growing the plant.</p>
+  
+  <div class="col-2" style="margin-top:24px; margin-bottom:24px; align-items:stretch;">
+    <div>
+      <h4 style="color:var(--neutral); font-family:'Newsreader',serif; font-size:1.2rem; margin-bottom:12px;">Option A — Import bulk leaf & create own brand</h4>
+      <div style="background:rgba(217,180,143,0.08); border-left:3px solid #944925; padding:16px; margin-bottom:12px; min-height:130px;">
+        <strong style="color:#D9B48F; font-size:0.9rem; display:block; margin-bottom:8px;">Pros</strong>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin:0; line-height:1.5;">Full control over branding, pricing, and margins. Build your own IP. Adapt flavour profiles to Indian taste. No dependency on one supplier brand. Bulk raw leaf from Brazil/Argentina can cost $3–6/kg vs. ₹800–1500/500g retail.</p>
+      </div>
+      <div style="background:rgba(148,73,37,0.08); border-left:3px solid var(--tertiary); padding:16px; margin-bottom:12px; min-height:130px;">
+        <strong style="color:#944925; font-size:0.9rem; display:block; margin-bottom:8px;">Cons</strong>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin:0; line-height:1.5;">Requires FSSAI import licence for food ingredients. Need blending/packaging facility. Quality control complexity. Long lead times from South America. MOQ of 500kg+ for bulk imports. No brand recognition from day one.</p>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-top:20px;"><strong>Best for:</strong> Anyone building a long-term D2C or B2B brand in India who wants to own the full value chain at scale. Minimum viable budget: ₹15–25 lakh to start.</p>
+    </div>
+    
+    <div>
+      <h4 style="color:var(--neutral); font-family:'Newsreader',serif; font-size:1.2rem; margin-bottom:12px;">Option B — Resell/distribute established brands</h4>
+      <div style="background:rgba(217,180,143,0.08); border-left:3px solid #944925; padding:16px; margin-bottom:12px; min-height:130px;">
+        <strong style="color:#D9B48F; font-size:0.9rem; display:block; margin-bottom:8px;">Pros</strong>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin:0; line-height:1.5;">No production risk. Immediately credible product (Las Marías, Rosamonte, CBSé are 50–150-year-old brands). Fast to market. Import in finished retail packs. MOQ as low as 1,000–5,000 units for branded resale. No blending or packaging needed.</p>
+      </div>
+      <div style="background:rgba(148,73,37,0.08); border-left:3px solid var(--tertiary); padding:16px; margin-bottom:12px; min-height:130px;">
+        <strong style="color:#944925; font-size:0.9rem; display:block; margin-bottom:8px;">Cons</strong>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin:0; line-height:1.5;">Lower margins (typically 30–50% gross vs. 60–70% own brand). No IP ownership. Dependent on supplier pricing. Limited ability to adapt product to Indian preferences. Can be displaced by parallel importers.</p>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-top:20px;"><strong>Best for:</strong> Quick market entry to test demand before committing to own brand. Good for online retail, specialty stores, and hospitality.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:24px; margin-bottom:32px;">
+    <p style="margin:0; font-size:0.95rem; color:var(--neutral); line-height:1.6;"><strong>Recommendation:</strong> The smartest approach for India is a hybrid — start by importing and reselling 2–3 established brands (e.g. Cruz de Malta + CBSé herbal) to build customer base and validate the market, then launch your own private-label line using bulk Argentine/Brazilian leaf once you hit ₹30–50L in revenue. CBSé and Centro Yerbatero Paraguayo are the most open to custom packaging partnerships for new markets.</p>
+  </div>
+  
+  <div class="chart-container" style="height:350px; margin-bottom:64px; border:none; background:transparent; padding:0;">
+    <canvas id="produceChart"></canvas>
+  </div>
+
+  <h2>Financial Projections (Year 1-5)</h2>
+  <div class="chart-container" style="margin-bottom:80px">
+    <canvas id="finChart"></canvas>
+  </div>
+
+</div>
+
+<script>
+Chart.defaults.font.family = 'Work Sans';
+Chart.defaults.color = 'rgba(245, 242, 234, 0.7)';
+Chart.defaults.borderColor = 'rgba(245, 242, 234, 0.1)';
+
+new Chart(document.getElementById('mainChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025','2026','2028','2030','2033'],
+    datasets: [{
+      label: 'Market Value (USD B)',
+      data: [1.3, 1.45, 1.6, 1.75, 2.1, 2.15, 2.25, 2.5, 2.8, 3.4],
+      backgroundColor: ['rgba(217,180,143,0.4)','rgba(217,180,143,0.4)','rgba(217,180,143,0.4)','rgba(217,180,143,0.4)','rgba(217,180,143,1)','rgba(217,180,143,1)','#944925','#944925','#944925','#944925'],
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', align: 'start', labels: { usePointStyle: true, boxWidth: 8 } } },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: function(value) { return '$' + value + 'B'; } } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('finChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Year 1','Year 2','Year 3','Year 4','Year 5'],
+    datasets: [
+      {label: 'Revenue', data: [15,35,80,150,250], backgroundColor: '#D9B48F', borderRadius: 4},
+      {label: 'COGS', data: [8,18,40,70,110], backgroundColor: '#F5F2EA', borderRadius: 4},
+      {label: 'Gross Profit', data: [7,17,40,80,140], backgroundColor: '#944925', borderRadius: 4},
+      {label: 'Net Profit', data: [-2,6,18,40,75], backgroundColor: '#F5F2EA', borderRadius: 4}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+    scales: {
+      y: { beginAtZero: true, title: { display: true, text: 'Lakhs ₹', color: 'rgba(245, 242, 234, 0.7)' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('beginnerChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Cruz de Malta', 'Taragüi', 'CBSé Herbs', 'Selecta', 'Yerba Madre RTD', 'Canarias', 'Pajarito Espec.', 'Del Cebador', 'Rosamonte', 'Kurupí'],
+    datasets: [
+      {label: 'Flavour intensity', data: [4, 5, 3, 4, 2, 10, 9, 9, 8, 8], backgroundColor: '#D9B48F', borderRadius: 2},
+      {label: 'Preparation difficulty', data: [3, 3, 2, 3, 1, 9, 7, 8, 6, 7], backgroundColor: '#D9B48F', borderRadius: 2},
+      {label: 'India accessibility', data: [7, 8, 7, 5, 9, 4, 4, 3, 6, 4], backgroundColor: '#944925', borderRadius: 2}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', align: 'start', labels: { usePointStyle: true, boxWidth: 8 } }, title: {display:false} },
+    scales: {
+      y: { beginAtZero: true, max: 11, title: { display: true, text: 'Score / 10', color: 'rgba(245, 242, 234, 0.7)' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('produceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Upfront cost', 'Scalability', 'Brand control', 'Gross margin', 'Time to market'],
+    datasets: [
+      {label: 'Own brand', data: [2, 9, 10, 8, 3], backgroundColor: '#D9B48F', borderRadius: 2},
+      {label: 'Resell brands', data: [8, 6, 3, 5, 9], backgroundColor: '#F5F2EA', borderRadius: 2}
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', align: 'start', labels: { usePointStyle: true, boxWidth: 8 } } },
+    scales: {
+      x: { beginAtZero: true, max: 11 },
+      y: { grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
